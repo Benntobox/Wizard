@@ -19,10 +19,8 @@ class Hand:
         return False
 
     def print(self):
-        print("HAND:")
         for card in self.hand:
             print(card)
-        print("ENDOHAND")
 
 
 class Deck:
@@ -37,7 +35,7 @@ class Deck:
 
     def draw(self):
         card = self.deck[0]
-        deck.remove(card)
+        self.deck.remove(card)
         return card
 
     def shuffle(self, shuffle_count=15):
@@ -56,10 +54,9 @@ class Deck:
         self.deck.remove(card)
 
     def print(self):
-        print("FULL DECK: ")
         for card in self.deck:
             print(card)
-        print("FINISHED")
+        print("\n")
 
 
 class Card:
@@ -82,6 +79,8 @@ class Player:
     name = ""
     hand = Hand()
     score = 0
+    current_bid = 0
+    current_tricks_won = 0
 
     def __init__(self, name="Default"):
         self.name = name
@@ -90,43 +89,100 @@ class Player:
         self.hand.add(card)
 
     def play(self, pos):
-        self.hand.play(pos)
+        return self.hand.play(pos)
 
     def score(self, points):
         self.score = self.score + points
+
+    def bid(self, guess):
+        self.current_bid = guess
+
+    def win(self):
+        self.current_tricks_won = self.current_tricks_won + 1
+
+    def clear(self):
+        self.hand = Hand()
+        self.current_bid = 0
+        self.current_tricks_won = 0
+
 
 class Wizard:
     players = []
     current_hand = []
     current_turn = 1
+    deck = Deck()
 
     def __init__(self, player_count=2, start=1):
         if start < 60 / player_count:
             self.current_turn = start
-        for player in range(player_count):
-            self.players.append(Player("Player " + str(player)))
+        for p in range(player_count):
+            self.players.append(Player("Player " + str(p + 1)))
+
+    def deal(self):
+        for player in self.players:
+            player.draw(self.deck.draw())
+
+    def bids(self):
+        for player in self.players:
+            print(player.name + " Hand")
+            player.hand.print()
+            curr_bid = int(input("Enter your bid: "))
+            player.current_bid = curr_bid
+
+    def play(self):
+        best = Card(0, 'z')
+        winner = Player()
+        for player in self.players:
+            choice = int(input("Choose a card to play"))
+            card = player.play(choice)
+            if best.suit == 'z':
+                best = card
+                winner = player
+            elif card.suit == best.suit and card.value > best.value:
+                best = card
+                winner = player
+
+        winner.win()
+
+    def end(self):
+        for player in self.players:
+            player.clear()
+
+    def score(self):
+        for player in self.players:
+            if player.current_bid == player.current_tricks_won:
+                player.score(20 + 10 * player.current_bid)
+            else:
+                player.score(-(abs(player.current_bid - player.current_tricks_won)))
+
+    def game(self):
+        while self.current_turn <= 60 / len(self.players):
+
+            deck = Deck()
+            deck.shuffle(30)
+
+            print("current turn " + str(self.current_turn))
+            print("p1 hand")
+            self.players[0].hand.print()
+
+            self.deal()
+
+            print("p1 hand")
+            self.players[0].hand.print()
+            print("p2 hand")
+            self.players[1].hand.print()
+
+            self.bids()
+
+            for rounds in range(self.current_turn):
+                self.play()
+
+            self.score()
+
+            self.current_turn = self.current_turn + 1
 
 
 if __name__ == "__main__":
-    deck = Deck()
+    game = Wizard(3, 3)
 
-    print("First")
-    deck.print()
-    testcard = Card(4, 's')
-    if deck.contains(testcard):
-        print("AHAHA")
-    deck.shuffle()
-    print("And then")
-    deck.print()
-
-    newcard = deck.draw()
-    print("OF COURSE")
-    print(newcard)
-    print("AND OF COURSE")
-
-    deck.print()
-
-    newcard = deck.draw()
-    print("OF COURSE")
-    print(newcard)
-    print("AND OF COURSE")
+    game.game()
