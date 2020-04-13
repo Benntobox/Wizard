@@ -8,7 +8,9 @@ class Hand:
         self.hand.append(card)
 
     def play(self, pos):
-        return self.hand[pos]
+        card = self.hand[pos]
+        self.hand.remove(card)
+        return card
 
     def contains(self, c):
         for card in self.hand:
@@ -27,7 +29,7 @@ class Deck:
     deck = []
 
     def __init__(self):
-        for val in range(1, 14):
+        for val in range(1, 16):
             for i in range(4):
                 suit = Card.suits[i]
                 card = Card(val, suit)
@@ -74,6 +76,35 @@ class Card:
 
     def __eq__(self, other):
         return self.value == other.value and self.suit == other.suit
+
+
+class Player:
+    name = ""
+    hand = Hand()
+    score = 0
+
+    def __init__(self, name="Default"):
+        self.name = name
+
+    def draw(self, card):
+        self.hand.add(card)
+
+    def play(self, pos):
+        self.hand.play(pos)
+
+    def score(self, points):
+        self.score = self.score + points
+
+class Wizard:
+    players = []
+    current_hand = []
+    current_turn = 1
+
+    def __init__(self, player_count=2, start=1):
+        if start < 60 / player_count:
+            self.current_turn = start
+        for player in range(player_count):
+            self.players.append(Player("Player " + str(player)))
 
 
 if __name__ == "__main__":
