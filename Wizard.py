@@ -1,40 +1,20 @@
 import random
 
 
-class Hand:
-
-    def __init__(self):
-        self.hand = []
-
-    def add(self, card):
-        self.hand.append(card)
-
-    def play(self, pos):
-        card = self.hand[pos]
-        self.hand.remove(card)
-        return card
-
-    def contains(self, c):
-        for card in self.hand:
-            if card == c:
-                return True
-        return False
-
-    def print(self):
-        for card in self.hand:
-            print(card)
-
-
 class Deck:
     def __init__(self):
         self.deck = []
+        suits = ['s', 'd', 'c', 'h']
         for val in range(1, 16):
             for i in range(4):
-                suit = Card.suits[i]
-                card = Card(val, suit)
+                suit = suits[i]
+                card = (val, suit)
                 self.deck.append(card)
 
     def draw(self):
+        if len(self.deck) == 0:
+            print("Empty Deck")
+            return None
         card = self.deck[0]
         self.deck.remove(card)
         return card
@@ -45,64 +25,34 @@ class Deck:
                 rand = random.randrange(len(self.deck))
                 self.deck[i], self.deck[rand] = self.deck[rand], self.deck[i]
 
-    def contains(self, c):
-        for card in self.deck:
-            if card == c:
-                return True
-        return False
-
-    def remove(self, card):
-        self.deck.remove(card)
-
-    def print(self):
-        for card in self.deck:
-            print(card)
-        print("\n")
-
-
-class Card:
-    value = 0
-    suit = ''
-    suits = ['s', 'd', 'c', 'h']
-
-    def __init__(self, value=0, suit='z'):
-        self.value = value if value != 0 else random.randrange(1, 13)
-        self.suit = suit if suit != 'z' else self.suits[random.randrange(0, 3)]
-
-    def __str__(self):
-        return str(self.value) + " of " + self.suit
-
-    def __eq__(self, other):
-        return self.value == other.value and self.suit == other.suit
-
 
 class Player:
-    name = ""
-    current_score = 0
-    current_bid = 0
-    current_tricks_won = 0
-
     def __init__(self, name="Default"):
         self.name = name
-        self.hand = Hand()
+        self.hand = []
+        self.current_score = 0
+        self.current_bid = 0
+        self.current_tricks_won = 0
 
     def draw(self, card):
-        self.hand.add(card)
+        self.hand.append(card)
 
     def play(self, pos):
-        return self.hand.play(pos)
+        card = self.hand[pos]
+        self.hand.remove(card)
+        return card
 
     def score(self, points):
         self.current_score = self.current_score + points
 
-    def bid(self, guess):
-        self.current_bid = guess
+    def bid(self, bid):
+        self.current_bid = bid
 
     def win(self):
         self.current_tricks_won = self.current_tricks_won + 1
 
     def clear(self):
-        self.hand = Hand()
+        self.hand = []
         self.current_bid = 0
         self.current_tricks_won = 0
 
