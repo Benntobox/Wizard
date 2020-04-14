@@ -7,9 +7,6 @@ class Deck:
         self.reset()
 
     def draw(self):
-        if len(self.deck) == 0:
-            print("Empty Deck")
-            return None
         card = self.deck[0]
         self.deck.remove(card)
         return card
@@ -33,7 +30,7 @@ class Player:
         self.hand = []
         self.current_score = 0
         self.current_bid = 0
-        self.current_tricks_won = 0
+        self.current_tricks = 0
 
     def draw(self, card):
         self.hand.append(card)
@@ -50,17 +47,16 @@ class Player:
         self.current_bid = bid
 
     def win(self):
-        self.current_tricks_won = self.current_tricks_won + 1
+        self.current_tricks = self.current_tricks + 1
 
     def clear(self):
         self.hand = []
         self.current_bid = 0
-        self.current_tricks_won = 0
+        self.current_tricks = 0
 
 
 class Wizard:
-
-    def __init__(self, player_count, turn=1):
+    def __init__(self, player_count=3, turn=1):
         self.deck = Deck()
         self.deck.shuffle()
 
@@ -83,19 +79,29 @@ class Wizard:
             player.current_bid = curr_bid
 
     def play(self):
-        best = None
-        winner = None
-        for player in self.players:
-            print(player.hand)
-            choice = int(input("Choose a card to play, " + player.name + "\n"))
-            card = player.play(choice)
-            if not best or card[1] == best[1] and card[0] > best[0]:
-                best = card
-                winner = player
-            print("Current leading card is ", best)
+        for rounds in range(self.turn):
+            best = None
+            winner = None
+            for player in self.players:
+                print(player.hand)
+                choice = int(input("Choose a card to play, " + player.name + "\n"))
+                card = player.play(choice)
+                if not best or card[1] == best[1] and card[0] > best[0]:
+                    best = card
+                    winner = player
+                print("Current leading card is ", best)
 
-        winner.win()
-        print("The winner of this round was: ", winner.name)
+            winner.win()
+            print("The winner of this round was: ", winner.name)
+
+    def score(self):
+        for player in self.players:
+            if player.current_bid == player.current_tricks:
+                player.score(20 + 10 * player.current_bid)
+            else:
+                player.score(-(abs(player.current_bid - player.current_tricks) * 10))
+        for player in self.players:
+            print(player.name, "score is :" + str(player.current_score))
 
     def end(self):
         for player in self.players:
@@ -103,28 +109,16 @@ class Wizard:
         self.deck.reset()
         self.turn = self.turn + 1
 
-    def score(self):
-        for player in self.players:
-            if player.current_bid == player.current_tricks_won:
-                player.score(20 + 10 * player.current_bid)
-            else:
-                player.score(-(abs(player.current_bid - player.current_tricks_won) * 10))
-        for player in self.players:
-            print(player.name, "score is :" + str(player.current_score))
-
     def game(self):
         while self.turn <= 60 / len(self.players):
             self.deal()
             self.bids()
-
-            for rounds in range(self.turn):
-                self.play()
-
+            self.play()
             self.score()
             self.end()
 
 
 if __name__ == "__main__":
-    game = Wizard(3, 1)
-    game.game()
+    wizard = Wizard()
+    wizard.game()
     print("GAME OVER ")
