@@ -4,12 +4,7 @@ import random
 class Deck:
     def __init__(self):
         self.deck = []
-        suits = ['s', 'd', 'c', 'h']
-        for val in range(1, 16):
-            for i in range(4):
-                suit = suits[i]
-                card = (val, suit)
-                self.deck.append(card)
+        self.reset()
 
     def draw(self):
         if len(self.deck) == 0:
@@ -19,11 +14,17 @@ class Deck:
         self.deck.remove(card)
         return card
 
-    def shuffle(self, shuffle_count=15):
-        for j in range(shuffle_count):
-            for i in range(len(self.deck)):
-                rand = random.randrange(len(self.deck))
-                self.deck[i], self.deck[rand] = self.deck[rand], self.deck[i]
+    def shuffle(self):
+        random.shuffle(self.deck)
+
+    def reset(self):
+        self.deck = []
+        suits = ['s', 'd', 'c', 'h']
+        for val in range(1, 16):
+            for i in range(4):
+                suit = suits[i]
+                card = (val, suit)
+                self.deck.append(card)
 
 
 class Player:
@@ -56,49 +57,42 @@ class Player:
         self.current_bid = 0
         self.current_tricks_won = 0
 
-    def print(self):
-        for card in self.hand.hand:
-            print(card)
-
 
 class Wizard:
-    players = []
-    current_hand = []
-    current_turn = 1
 
-    def __init__(self, player_count=2, start=1):
+    def __init__(self, player_count, turn=1):
         self.deck = Deck()
-        self.deck.shuffle(30)
-        if start < 60 / player_count:
-            self.current_turn = start
+        self.deck.shuffle()
+
+        self.turn = turn if 0 < turn < (60 / player_count) else 1
+
+        self.players = []
         for p in range(player_count):
             self.players.append(Player("Player " + str(p + 1)))
 
     def deal(self):
         for player in self.players:
-            for _ in range(self.current_turn):
+            for _ in range(self.turn):
                 player.draw(self.deck.draw())
 
     def bids(self):
         for player in self.players:
             print(player.name + " Hand")
-            player.hand.print()
-            curr_bid = int(input("Enter your bid: "))
+            print(player.hand)
+            curr_bid = int(input("Enter your bid: \n"))
             player.current_bid = curr_bid
 
     def play(self):
-        best = Card(0, 'z')
-        winner = self.players[0]
+        best = None
+        winner = None
         for player in self.players:
-            player.print()
-            choice = int(input("Choose a card to play, " + player.name))
+            print(player.hand)
+            choice = int(input("Choose a card to play, " + player.name + "\n"))
             card = player.play(choice)
-            if best.suit == 'z':
+            if not best or card[1] == best[1] and card[0] > best[0]:
                 best = card
                 winner = player
-            elif card.suit == best.suit and card.value > best.value:
-                best = card
-                winner = player
+            print("Current leading card is ", best)
 
         winner.win()
         print("The winner of this round was: ", winner.name)
@@ -106,6 +100,8 @@ class Wizard:
     def end(self):
         for player in self.players:
             player.clear()
+        self.deck.reset()
+        self.turn = self.turn + 1
 
     def score(self):
         for player in self.players:
@@ -113,29 +109,22 @@ class Wizard:
                 player.score(20 + 10 * player.current_bid)
             else:
                 player.score(-(abs(player.current_bid - player.current_tricks_won) * 10))
+        for player in self.players:
+            print(player.name, "score is :" + str(player.current_score))
 
     def game(self):
-        while self.current_turn <= 60 / len(self.players):
-
-            self.deck = Deck()
-            self.deck.shuffle(30)
-
+        while self.turn <= 60 / len(self.players):
             self.deal()
-
             self.bids()
 
-            for rounds in range(self.current_turn):
+            for rounds in range(self.turn):
                 self.play()
 
             self.score()
-
-            for player in self.players:
-                print(player.name, "score is :" + str(player.current_score))
-
-            self.current_turn = self.current_turn + 1
+            self.end()
 
 
 if __name__ == "__main__":
-    game = Wizard(3, 3)
-
+    game = Wizard(3, 1)
     game.game()
+    print("GAME OVER ")
