@@ -4,6 +4,7 @@ import random
 class Deck:
     def __init__(self):
         self.deck = []
+        self.suits = ['s', 'd', 'c', 'h']
         self.reset()
 
     def draw(self):
@@ -16,10 +17,9 @@ class Deck:
 
     def reset(self):
         self.deck = []
-        suits = ['s', 'd', 'c', 'h']
         for val in range(1, 16):
             for i in range(4):
-                suit = suits[i]
+                suit = self.suits[i]
                 card = (val, suit)
                 self.deck.append(card)
 
@@ -46,7 +46,7 @@ class Player:
     def bid(self, bid):
         self.current_bid = bid
 
-    def win(self):
+    def win_trick(self):
         self.current_tricks = self.current_tricks + 1
 
     def clear(self):
@@ -59,6 +59,7 @@ class Wizard:
     def __init__(self, player_count=3, turn=1):
         self.deck = Deck()
         self.deck.shuffle()
+        self.trump_suit = 'z'
 
         self.turn = turn if 0 < turn < (60 / player_count) else 1
 
@@ -72,7 +73,15 @@ class Wizard:
                 player.draw(self.deck.draw())
 
     def bids(self):
+        if self.turn != 60 / len(self.players):
+            trump = self.deck.draw()
+            if trump[0] == 15:
+                self.trump_suit = input("Enter the letter of trump suit:")
+            elif trump[0] != 1:
+                self.trump_suit = trump[1]
+        print("Trump is", "none" if self.trump_suit == 'z' else self.trump_suit)
         for player in self.players:
+            print("Trump is", self.trump_suit)
             print(player.name + " Hand")
             print(player.hand)
             curr_bid = int(input("Enter your bid: \n"))
@@ -83,16 +92,17 @@ class Wizard:
             best = None
             winner = None
             for player in self.players:
+                print("Trump is", self.trump_suit)
                 print(player.hand)
                 choice = int(input("Choose a card to play, " + player.name + "\n"))
                 card = player.play(choice)
-                if not best or card[1] == best[1] and card[0] > best[0]:
+                if self.find_winner(best, card, self.trump_suit) == card:
                     best = card
                     winner = player
                 print("Current leading card is ", best)
 
-            winner.win()
-            print("The winner of this round was: ", winner.name)
+            winner.win_trick()
+            print("The winner of this round was: ", winner.name, "\n")
 
     def score(self):
         for player in self.players:
@@ -107,6 +117,7 @@ class Wizard:
         for player in self.players:
             player.clear()
         self.deck.reset()
+        self.trump_suit = 'z'
         self.turn = self.turn + 1
 
     def game(self):
@@ -117,8 +128,26 @@ class Wizard:
             self.score()
             self.end()
 
+    @staticmethod
+    def find_winner(lead_card, played_card, trump_suit):
+        if not lead_card:
+            return played_card
+
+        lead_val, lead_suit = lead_card[0], lead_card[1]
+        played_val, played_suit = played_card[0], played_card[1]
+
+        if lead_val == 15 or played_val == 1:
+            return lead_card
+        if played_val == 15 or lead_val == 1:
+            return played_card
+        if lead_suit != played_suit:
+            return played_card if played_suit == trump_suit else lead_card
+        if lead_val >= played_val:
+            return lead_card
+        return played_card
+
 
 if __name__ == "__main__":
-    wizard = Wizard()
+    wizard = Wizard(4, 3)
     wizard.game()
     print("GAME OVER ")
