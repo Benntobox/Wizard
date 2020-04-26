@@ -1,58 +1,5 @@
-import random
-
-
-class Deck:
-    def __init__(self):
-        self.deck = []
-        self.suits = ['s', 'd', 'c', 'h']
-        self.reset()
-
-    def draw(self):
-        card = self.deck[0]
-        self.deck.remove(card)
-        return card
-
-    def shuffle(self):
-        random.shuffle(self.deck)
-
-    def reset(self):
-        self.deck = []
-        for val in range(1, 16):
-            for i in range(4):
-                suit = self.suits[i]
-                card = (val, suit)
-                self.deck.append(card)
-
-
-class Player:
-    def __init__(self, name="Default"):
-        self.name = name
-        self.hand = []
-        self.current_score = 0
-        self.current_bid = 0
-        self.current_tricks = 0
-
-    def draw(self, card):
-        self.hand.append(card)
-
-    def play(self, pos):
-        card = self.hand[pos]
-        self.hand.remove(card)
-        return card
-
-    def score(self, points):
-        self.current_score = self.current_score + points
-
-    def bid(self, bid):
-        self.current_bid = bid
-
-    def win_trick(self):
-        self.current_tricks = self.current_tricks + 1
-
-    def clear(self):
-        self.hand = []
-        self.current_bid = 0
-        self.current_tricks = 0
+import Deck
+import Player
 
 
 class Wizard:
@@ -85,7 +32,7 @@ class Wizard:
             print(player.name + " Hand")
             print(player.hand)
             curr_bid = int(input("Enter your bid: \n"))
-            player.current_bid = curr_bid
+            player.bid = curr_bid
 
     def play(self):
         for rounds in range(self.turn):
@@ -106,10 +53,10 @@ class Wizard:
 
     def score(self):
         for player in self.players:
-            if player.current_bid == player.current_tricks:
-                player.score(20 + 10 * player.current_bid)
+            if player.bid == player.tricks:
+                player.score(20 + 10 * player.bid)
             else:
-                player.score(-(abs(player.current_bid - player.current_tricks) * 10))
+                player.score(-(abs(player.bid - player.tricks) * 10))
         for player in self.players:
             print(player.name, "score is :" + str(player.current_score))
 
@@ -146,8 +93,3 @@ class Wizard:
             return lead_card
         return played_card
 
-
-if __name__ == "__main__":
-    wizard = Wizard(4, 3)
-    wizard.game()
-    print("GAME OVER ")
