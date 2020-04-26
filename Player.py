@@ -7,14 +7,15 @@ class Player:
         self.tricks = 0
 
     def draw(self, card):
-        self.hand.append(card)
+        if card:
+            self.hand.append(card)
 
     def play(self, pos):
         card = self.hand[pos]
         self.hand.remove(card)
         return card
 
-    def score(self, points):
+    def add_score(self, points):
         self.score = self.score + points
 
     def bid(self, bid):

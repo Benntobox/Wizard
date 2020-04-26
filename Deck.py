@@ -8,6 +8,8 @@ class Deck:
         self.reset()
 
     def draw(self):
+        if len(self.deck) == 0:
+            return None
         card = self.deck[0]
         self.deck.remove(card)
         return card
