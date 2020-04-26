@@ -1,0 +1,74 @@
+EXAMPLE ROUND, 4 PLAYERS, TURN 3
+
+Player 1 Hand
+[(7, 'd'), (14, 's'), (13, 's')]
+Enter your bid: 
+2
+Player 2 Hand
+[(1, 'c'), (2, 's'), (6, 'c')]
+Enter your bid: 
+0
+Player 3 Hand
+[(2, 'd'), (12, 'h'), (11, 'h')]
+Enter your bid: 
+1
+Player 4 Hand
+[(5, 'd'), (1, 'h'), (3, 'h')]
+Enter your bid: 
+0
+[(7, 'd'), (14, 's'), (13, 's')]
+Choose a card to play, Player 1
+2
+Current leading card is  (13, 's')
+[(1, 'c'), (2, 's'), (6, 'c')]
+Choose a card to play, Player 2
+1
+Current leading card is  (13, 's')
+[(2, 'd'), (12, 'h'), (11, 'h')]
+Choose a card to play, Player 3
+0
+Current leading card is  (13, 's')
+[(5, 'd'), (1, 'h'), (3, 'h')]
+Choose a card to play, Player 4
+0
+Current leading card is  (13, 's')
+The winner of this round was:  Player 1
+[(7, 'd'), (14, 's')]
+Choose a card to play, Player 1
+1
+Current leading card is  (14, 's')
+[(1, 'c'), (6, 'c')]
+Choose a card to play, Player 2
+0
+Current leading card is  (14, 's')
+[(12, 'h'), (11, 'h')]
+Choose a card to play, Player 3
+1
+Current leading card is  (14, 's')
+[(1, 'h'), (3, 'h')]
+Choose a card to play, Player 4
+0
+Current leading card is  (14, 's')
+The winner of this round was:  Player 1
+[(7, 'd')]
+Choose a card to play, Player 1
+0
+Current leading card is  (7, 'd')
+[(6, 'c')]
+Choose a card to play, Player 2
+0
+Current leading card is  (7, 'd')
+[(12, 'h')]
+Choose a card to play, Player 3
+0
+Current leading card is  (7, 'd')
+[(3, 'h')]
+Choose a card to play, Player 4
+0
+Current leading card is  (7, 'd')
+The winner of this round was:  Player 1
+Player 1 score is :-10
+Player 2 score is :20
+Player 3 score is :-10
+Player 4 score is :20
+-->
